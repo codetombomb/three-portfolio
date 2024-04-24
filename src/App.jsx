@@ -5,104 +5,114 @@ import {
   OrbitControls,
   Instance,
   Instances,
+  PerspectiveCamera,
 } from "@react-three/drei";
 import { useControls } from "leva";
 import { AmbientLight, MeshNormalMaterial } from "three";
+import SpikeWall from "./components/SpikeWall";
+import { Suspense } from "react";
 
 function App() {
   const pyramidSpike = useGLTF("./dark-pyramid-spike.glb");
 
-  const { pyramidSpikeX, pyramidSpikeY, pyramidSpikeZ, scalePyramidSpike } =
-    useControls("pyramidSpike", {
-      pyramidSpikeX: { value: 0, step: 0.001, min: -50, max: 50 },
-      pyramidSpikeY: { value: 0, step: 0.001, min: -50, max: 50 },
-      pyramidSpikeZ: { value: 0, step: 0.001, min: -50, max: 50 },
-      scaplePyramidSpike: { value: 0.2, step: 0.001, min: 0, max: 4 },
-    });
+  // const { pyramidSpikeX, pyramidSpikeY, pyramidSpikeZ, scalePyramidSpike } =
+  //   useControls("pyramidSpike", {
+  //     pyramidSpikeX: { value: 0, step: 0.001, min: -50, max: 50 },
+  //     pyramidSpikeY: { value: 0, step: 0.001, min: -50, max: 50 },
+  //     pyramidSpikeZ: { value: 0, step: 0.001, min: -50, max: 50 },
+  //     scaplePyramidSpike: { value: 0.2, step: 0.001, min: 0, max: 4 },
+  //   });
 
-  const {
-    wallX,
-    wallY,
-    wallZ,
-    numSpikesX,
-    numSpikesZ,
-    spikeSpacingX,
-    spikeSpacingZ,
-    wallRotationX,
-    wallRotationY,
-    wallRotationZ,
-  } = useControls("wall", {
-    wallX: { value: -10, step: 0.001, min: -50, max: 50 },
-    wallY: { value: -10, step: 0.001, min: -50, max: 50 },
-    wallZ: { value: -37.96, step: 0.001, min: -60, max: 50 },
-    wallRotationX: { value: 0, step: 0.0001, min: -10, max: 10 },
-    wallRotationY: { value: 0, step: 0.0001, min: -10, max: 10 },
-    wallRotationZ: { value: -1.54, step: 0.0001, min: -10, max: 10 },
-    numSpikesX: { value: 20, step: 2, min: 4, max: 100 },
-    numSpikesZ: { value: 10, step: 2, min: 4, max: 100 },
-    spikeSpacingX: { value: 4, step: 0.001, min: 0, max: 10 },
-    spikeSpacingZ: { value: 4, step: 0.001, min: 0, max: 10 },
-  });
+  // const {
+  //   wallX,
+  //   wallY,
+  //   wallZ,
+  //   numSpikesX,
+  //   numSpikesZ,
+  //   spikeSpacingX,
+  //   spikeSpacingZ,
+  //   wallRotationX,
+  //   wallRotationY,
+  //   wallRotationZ,
+  // } = useControls("wall", {
+  //   wallX: { value: 18.05, step: 0.001, min: -50, max: 50 },
+  //   wallY: { value: -4.0, step: 0.001, min: -50, max: 50 },
+  //   wallZ: { value: -38.5, step: 0.001, min: -60, max: 50 },
+  //   wallRotationX: { value: 0, step: 0.0001, min: -10, max: 10 },
+  //   wallRotationY: { value: -Math.PI / 2, step: 0.0001, min: -10, max: 10 },
+  //   wallRotationZ: { value: -Math.PI / 2, step: 0.0001, min: -10, max: 10 },
+  //   numSpikesX: { value: 20, step: 2, min: 4, max: 100 },
+  //   numSpikesZ: { value: 10, step: 2, min: 4, max: 100 },
+  //   spikeSpacingX: { value: 4, step: 0.001, min: 0, max: 10 },
+  //   spikeSpacingZ: { value: 4, step: 0.001, min: 0, max: 10 },
+  // });
 
   const {
     floorScaleX,
     floorScaleY,
+    floorScaleZ,
     floorRotationY,
     floorPositionX,
     floorPositionY,
     floorPositionZ,
   } = useControls("floor", {
-    floorScaleX: { value: 100, step: 0.001, min: -50, max: 50 },
-    floorScaleY: { value: 100, step: 0.001, min: -50, max: 50 },
+    floorScaleX: { value: 80.0, step: 0.001, min: -100, max: 100 },
+    floorScaleY: { value: 80.0, step: 0.001, min: -100, max: 100 },
+    floorScaleZ: { value: 80.0, step: 0.001, min: -100, max: 100 },
     floorRotationY: { value: Math.PI * 0.5, step: 0.001, min: 0, max: 10 },
-    floorPositionX: { value: 13.35, step: 0.001, min: -50, max: 50 },
-    floorPositionY: { value: -8.22, step: 0.001, min: -50, max: 50 },
-    floorPositionZ: { value: -35, step: 0.001, min: -50, max: 50 },
+    floorPositionX: { value: 0, step: 0.001, min: -50, max: 50 },
+    floorPositionY: { value: -2, step: 0.001, min: -50, max: 50 },
+    floorPositionZ: { value: 0, step: 0.001, min: -50, max: 50 },
   });
 
-  const renderSpikes = () => {
-    return (
-      <Instances
-        limit={numSpikesX * numSpikesZ}
-        position={[wallX, wallY, wallZ]}
-        scale={scalePyramidSpike}
-        rotation={[wallRotationX, wallRotationY, wallRotationZ]}
-      >
-        <primitive
-          object={pyramidSpike.nodes.Cube.geometry}
-          attach="geometry"
-        />
-        <primitive
-          object={pyramidSpike.nodes.Cube.material}
-          attach="material"
-        />
-        {[...Array(numSpikesZ)].flatMap((_, i) =>
-          [...Array(numSpikesX)].map((_, j) => (
-            <Instance
-              key={`${i}-${j}`}
-              position={[
-                (i - numSpikesX / 2) * spikeSpacingX + pyramidSpikeX,
-                pyramidSpikeY,
-                (j - numSpikesZ / 2) * spikeSpacingZ + pyramidSpikeZ,
-              ]}
-            />
-          ))
-        )}
-      </Instances>
-    );
-  };
   return (
     <>
       <Environment preset="apartment" />
-      <OrbitControls makeDefault scale={[4, 0, 0]} />
+      <PerspectiveCamera makeDefault position={[-5, 10, 15]} fov={100} />
+      <OrbitControls target={[0, 0, 0]} />
 
       <ambientLight />
 
       <group name="spikeWall">
-        {renderSpikes()}
+        {/* {renderSpikes()} */}
+
+        <SpikeWall
+          pyramidSpike={pyramidSpike}
+          numSpikesX={20}
+          numSpikesZ={10}
+          wallX={38.5}
+          wallY={-4.0}
+          wallZ={18}
+          scalePyramidSpike={1}
+          wallRotationX={0}
+          wallRotationY={Math.PI}
+          wallRotationZ={-Math.PI / 2}
+          spikeSpacingX={4}
+          spikeSpacingZ={4}
+          pyramidSpikeX={0}
+          pyramidSpikeY={0}
+          pyramidSpikeZ={0}
+        />
+        <SpikeWall
+          pyramidSpike={pyramidSpike}
+          numSpikesX={20}
+          numSpikesZ={10}
+          wallX={18.05}
+          wallY={-4.0}
+          wallZ={-38.5}
+          scalePyramidSpike={1}
+          wallRotationX={0}
+          wallRotationY={-Math.PI / 2}
+          wallRotationZ={-Math.PI / 2}
+          spikeSpacingX={4}
+          spikeSpacingZ={4}
+          pyramidSpikeX={0}
+          pyramidSpikeY={0}
+          pyramidSpikeZ={0}
+        />
 
         <mesh
-          scale={[floorScaleX, floorScaleY]}
+          scale={[floorScaleX, floorScaleY, floorScaleZ]}
           rotation={[-Math.PI * 0.5, 0, floorRotationY]}
           position={[floorPositionX, floorPositionY, floorPositionZ]}
         >

@@ -1,6 +1,6 @@
 import { Instance, Instances } from "@react-three/drei";
 
-export default function SpikeWall(
+export default function SpikeWall({
   pyramidSpike,
   numSpikesX,
   numSpikesZ,
@@ -15,9 +15,8 @@ export default function SpikeWall(
   spikeSpacingZ,
   pyramidSpikeX,
   pyramidSpikeY,
-  pyramidSpikeZ
-) {
-  console.log(pyramidSpike);
+  pyramidSpikeZ,
+}) {
   return (
     <Instances
       limit={numSpikesX * numSpikesZ}
@@ -25,14 +24,8 @@ export default function SpikeWall(
       scale={scalePyramidSpike}
       rotation={[wallRotationX, wallRotationY, wallRotationZ]}
     >
-      <primitive
-        object={pyramidSpike.pyramidSpike.nodes.Cube.geometry}
-        attach="geometry"
-      />
-      <primitive
-        object={pyramidSpike.pyramidSpike.nodes.Cube.material}
-        attach="material"
-      />
+      <primitive object={pyramidSpike.nodes.Cube.geometry} attach="geometry" />
+      <primitive object={pyramidSpike.nodes.Cube.material} attach="material" />
       {[...Array(numSpikesZ)].flatMap((_, i) =>
         [...Array(numSpikesX)].map((_, j) => (
           <Instance
